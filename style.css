@@ -148,3 +148,42 @@ body.touch .overlay .card{width:100%;max-width:520px;padding:0}
    iPhone shows the Add to Home Screen tip, hidden once it's running as a Home Screen app. */
 body.touch.can-fullscreen #fullscreen{display:inline-flex}
 body.touch.can-fullscreen .home-hint,body.touch.standalone .home-hint{display:none}
+
+/* ---------- low-key HUD (PC and phone): no radar, no boxes, smaller and quieter ---------- */
+.navigation{display:none!important}
+.telemetry{gap:24px;background:none;border:0;backdrop-filter:none;-webkit-backdrop-filter:none;text-shadow:0 1px 10px rgba(3,12,14,.85)}
+.telemetry>div{min-width:0;padding:0}
+.telemetry>div+div{border-left:0}
+.telemetry small{font-size:7px;letter-spacing:.24em;opacity:.75}
+.telemetry b{margin-top:4px;font-size:13px;opacity:.92}
+.actions{gap:2px}
+.actions button{height:26px;padding:0 8px;background:none;border-color:transparent;font-size:8px;opacity:.5;transition:opacity .2s,background .2s}
+.actions button:hover,.actions button:focus-visible{opacity:1;background:rgba(108,155,143,.14)}
+.actions #frame-rate{border-left:0;padding-left:2px}
+.left-rail{width:112px;padding:0;background:none;border:0;backdrop-filter:none;-webkit-backdrop-filter:none;text-shadow:0 1px 10px rgba(3,12,14,.85)}
+.rail-label{display:none}
+.resource small,.left-rail>small{font-size:7px;letter-spacing:.24em;opacity:.75}
+.resource+.resource{margin-top:10px}.left-rail>small{margin-top:11px}
+.cells{gap:4px;margin-top:5px}.cells i{width:20px;height:3px}
+.speed{width:68px;height:3px;margin-top:5px}
+.nerve-dial{width:72px;height:36px;margin-top:6px;opacity:.9;-webkit-mask:radial-gradient(circle at 50% 100%,transparent 60%,#000 62%);mask:radial-gradient(circle at 50% 100%,transparent 60%,#000 62%)}
+.nerve-dial::after{display:none}
+.nerve-dial i{width:2px;height:36px;left:calc(50% - 1px)}
+.nerve-label{width:72px;margin-top:4px;font-size:8px}
+body.touch .left-rail{width:100px;padding:0;left:calc(18px + env(safe-area-inset-left))}
+body.touch .left-rail .nerve-dial{width:64px;height:32px;margin:5px 0 0}
+body.touch .left-rail .nerve-dial::after{display:none}
+body.touch .left-rail .nerve-dial i{height:32px}
+body.touch .left-rail .nerve-label{width:64px;font-size:7px}
+@media(max-height:500px){body.touch .telemetry>div{min-width:0;padding:0}body.touch .telemetry b{font-size:12px}}
+
+/* ---------- phone boost (double-tap & hold) and caught-only rewind ---------- */
+#boost-ring{display:none}
+body.touch #boost-ring{display:grid;place-items:center;position:fixed;z-index:14;left:0;top:0;width:92px;height:92px;margin:-46px 0 0 -46px;border:2px solid var(--orange);border-radius:50%;box-shadow:0 0 26px rgba(239,183,123,.55),inset 0 0 16px rgba(239,183,123,.3);pointer-events:none;opacity:0;transform:scale(.55);transition:opacity .12s,transform .12s}
+body.touch #boost-ring.on{opacity:1;transform:scale(1)}
+#boost-ring span{position:absolute;top:-20px;color:var(--orange);font:400 8px/1 'Michroma',sans-serif;letter-spacing:.22em;text-shadow:0 1px 8px rgba(3,12,14,.9)}
+body.touch #touch-buttons{z-index:18;right:calc(28px + env(safe-area-inset-right));bottom:calc(16vh + env(safe-area-inset-bottom))}
+body.touch #touch-rewind{display:none}
+body.touch[data-mode=caught]:not(.no-rewinds) #touch-buttons #touch-rewind{display:grid;width:86px;height:86px;margin:0;font-size:30px;border-width:2px;background:rgba(9,27,29,.75);animation:rewind-in .28s cubic-bezier(.2,1.5,.4,1) both,rewind-pulse 1s .3s infinite}
+body.touch[data-mode=caught] #touch-buttons #touch-rewind small{font-size:7px;margin-top:-10px}
+@keyframes rewind-in{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}

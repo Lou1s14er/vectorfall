@@ -1403,7 +1403,7 @@
     overlay.classList.add('hidden');
     startBtn.blur();  // so Space (rewind) can't "click" the hidden start button
     lockCursor();
-    showMessage(isTouch ? 'LEFT THUMB FLY · RIGHT THUMB LOOK · HOLD BOOST' : 'WASD MOVE · ARROWS OR TRACKPAD LOOK · ESC FREES CURSOR', 3200);
+    showMessage(isTouch ? 'LEFT THUMB FLY · RIGHT THUMB LOOK · DOUBLE-TAP & HOLD RIGHT TO BOOST' : 'WASD MOVE · ARROWS OR TRACKPAD LOOK · ESC FREES CURSOR', 3200);
   }
 
   function collectSpark() {
@@ -2129,6 +2129,7 @@
     shieldBadge.classList.toggle('hidden', shields === 0);
     shieldCount.textContent = `×${shields}`;
     document.body.classList.toggle('shielded', shields > 0);
+    document.body.classList.toggle('no-rewinds', rewinds === 0);
   }
 
   function drawCells(el, max, amount) {
@@ -2311,7 +2312,8 @@
   // Phone / tablet controls. PC controls above are untouched; none of this runs on a computer.
   //  - left side of the screen: a floating joystick appears under your thumb (analog flying)
   //  - right side: drag to look, pinch with two fingers to zoom
-  //  - BOOST (hold) and ⟲ REWIND (tap) buttons bottom right
+  //  - double-tap the right side and keep the finger down to boost (you can still look with it)
+  //  - a ⟲ REWIND button appears only while you're caught
   // Running as a Home Screen app (already full screen), or can this browser go full screen itself (Android)?
   const standalone = matchMedia('(display-mode: fullscreen), (display-mode: standalone)').matches || navigator.standalone === true;
   const canFullscreen = !!(document.fullscreenEnabled && document.documentElement.requestFullscreen);
@@ -2333,7 +2335,7 @@
     const layer = document.getElementById('touch-layer');
     const stick = document.getElementById('stick');
     const knob = stick.querySelector('i');
-    const boostBtn = document.getElementById('touch-boost');
+    const boostRing = document.getElementById('boost-ring');
     const rewindBtn = document.getElementById('touch-rewind');
     const STICK_R = 52;
     const DEAD = 0.14;
@@ -2342,6 +2344,20 @@
     let sx = 0;
     let sy = 0;
     let pinch = 0;
+    let boostId = null;
+    let lastTap = null;                // a quick tap on the right side; a second press soon after boosts
+    const TAP_MS = 260;
+    const DOUBLE_MS = 380;
+
+    const stopBoost = () => {
+      boostId = null;
+      touchBoost = false;
+      boostRing.classList.remove('on');
+    };
+    const moveRing = (x, y) => {
+      boostRing.style.left = `${x}px`;
+      boostRing.style.top = `${y}px`;
+    };
 
     const restStick = () => {
       stickId = null;
@@ -2363,7 +2379,15 @@
         stick.style.top = `${sy}px`;
         stick.classList.add('on');
       } else {
-        looks.set(e.pointerId, { x: e.clientX, y: e.clientY });
+        const now = performance.now();
+        if (boostId === null && lastTap && now - lastTap.t < DOUBLE_MS && Math.hypot(e.clientX - lastTap.x, e.clientY - lastTap.y) < 90) {
+          boostId = e.pointerId;
+          touchBoost = true;
+          moveRing(e.clientX, e.clientY);
+          boostRing.classList.add('on');
+        }
+        lastTap = null;
+        looks.set(e.pointerId, { x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, t: now });
         pinch = 0;
       }
     });
@@ -2385,6 +2409,7 @@
       }
       const prev = looks.get(e.pointerId);
       if (!prev) return;
+      if (e.pointerId === boostId) moveRing(e.clientX, e.clientY);
       const dx = e.clientX - prev.x;
       const dy = e.clientY - prev.y;
       prev.x = e.clientX;
@@ -2400,24 +2425,22 @@
     });
     const release = (e) => {
       if (e.pointerId === stickId) restStick();
+      if (e.pointerId === boostId) stopBoost();
+      const p = looks.get(e.pointerId);
+      if (p && e.type === 'pointerup' && performance.now() - p.t < TAP_MS && Math.hypot(p.x - p.sx, p.y - p.sy) < 14) {
+        lastTap = { t: performance.now(), x: p.x, y: p.y };
+      }
       looks.delete(e.pointerId);
       pinch = 0;
     };
     layer.addEventListener('pointerup', release);
     layer.addEventListener('pointercancel', release);
 
-    const hold = (on) => (e) => {
-      e.preventDefault();
-      touchBoost = on;
-      boostBtn.classList.toggle('held', on);
-    };
-    boostBtn.addEventListener('pointerdown', hold(true));
-    ['pointerup', 'pointercancel', 'pointerleave'].forEach((t) => boostBtn.addEventListener(t, hold(false)));
     rewindBtn.addEventListener('pointerdown', (e) => {
       e.preventDefault();
       rewind();
     });
-    addEventListener('blur', restStick);
+    addEventListener('blur', () => { restStick(); stopBoost(); });
   }
   if (isTouch) setupTouch();
   addEventListener('resize', () => {

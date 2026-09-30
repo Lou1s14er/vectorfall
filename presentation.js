@@ -320,7 +320,7 @@
       this.hudTimer += dt;
       if (this.hudTimer < 0.08) return;
       this.hudTimer = 0;
-      this.drawRadar(spark,echoes,yaw,time);
+      if (this.rad.canvas.offsetParent) this.drawRadar(spark,echoes,yaw,time);  // radar panel is hidden now
       const distance = Math.hypot(spark.position.x-this.player.position.x,spark.position.z-this.player.position.z);
       this.distanceEl.textContent = `${Math.round(distance)} m`;
       this.echoEl.textContent = `${String(echoes.length).padStart(2,'0')} ECHOES`;

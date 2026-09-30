@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#081719">
+  <title>Afterglow: Vectorfall</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+  <meta name="apple-mobile-web-app-title" content="Vectorfall">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Michroma&family=Jost:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body data-mode="title">
+  <main id="game-shell">
+    <div id="world" aria-label="Afterglow Vectorfall 3D game"></div>
+    <div id="haunt" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
+    <div class="vignette" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <div class="brand">
+        <span class="atom" aria-hidden="true"><i></i><i></i><i></i><b></b></span>
+        <div>
+          <small>AFTERGLOW &middot; TEMPORAL EXPEDITION</small>
+          <strong>VECTORFALL</strong>
+        </div>
+      </div>
+      <div class="telemetry">
+        <div><small>SCORE</small><b id="score">00000</b></div>
+        <div><small>SECTOR</small><b id="level">01</b></div>
+        <div><small>SPARKS</small><b id="sparks">00/10</b></div>
+      </div>
+      <div class="actions">
+        <button id="quality" type="button" title="High: reflections and bloom. Lite: faster rendering.">VISUALS <b>HIGH</b><small id="frame-rate">— FPS</small></button>
+        <button id="mute" type="button" aria-label="Toggle audio" title="Audio (M)">AUDIO <b>ON</b></button>
+        <button id="fullscreen" type="button" aria-label="Enter fullscreen">FULLSCREEN <b>↗</b></button>
+      </div>
+    </header>
+
+    <aside class="left-rail">
+      <div class="rail-label">TEMPORAL RESERVES</div>
+      <div class="resource">
+        <small>REWINDS</small>
+        <div id="rewinds" class="cells"></div>
+      </div>
+      <div class="resource">
+        <small>SHIELDS</small>
+        <div id="shields" class="cells cells--teal"></div>
+      </div>
+      <small>VELOCITY</small>
+      <div class="speed"><span id="speed-bar"></span></div>
+      <small>NERVE</small>
+      <div class="nerve-dial" aria-hidden="true"><i id="nerve-needle"></i></div>
+      <b id="nerve-label" class="nerve-label" data-level="calm">CALM</b>
+    </aside>
+
+    <div class="reticle" aria-hidden="true"><i></i></div>
+
+    <section id="overlay" class="overlay">
+      <div class="card">
+        <div class="eames" aria-hidden="true"><i></i><i></i><i></i></div>
+        <div class="transmission"><span class="signal-dot"></span> THE AFTERGLOW PROGRAM &nbsp; / &nbsp; 1964</div>
+        <p class="kicker">YOUR PAST IS CATCHING UP.</p>
+        <h1>CHASE THE<br><span>LIGHT.</span></h1>
+        <p class="lede">A beautiful place to lose yourself.<br>Collect the light. Every path you fly becomes a ghost that hunts you along it. The more you panic, the wilder it becomes.</p>
+        <div class="mission-meta"><span>01 <b>THE OBSERVATORY</b></span><span>10 <b>SPARKS TO ESCAPE</b></span></div>
+        <div class="controls controls-pc">
+          <span><kbd>WASD</kbd><em>MOVE</em></span>
+          <span><kbd>ARROWS</kbd> / <kbd>TRACKPAD</kbd><em>LOOK</em></span>
+          <span><kbd>SHIFT</kbd> / <kbd>HOLD CLICK</kbd><em>BOOST</em></span>
+          <span><kbd>SPACE</kbd><em>REWIND</em></span>
+        </div>
+        <p class="look-hint look-hint-pc">Click to steer &middot; Swipe to look &middot; Pinch to zoom &middot; Esc releases cursor</p>
+        <div class="controls controls-touch">
+          <span><kbd>LEFT THUMB</kbd><em>FLY</em></span>
+          <span><kbd>RIGHT THUMB</kbd><em>LOOK</em></span>
+          <span><kbd>HOLD BOOST</kbd><em>FAST</em></span>
+          <span><kbd class="glyph">⟲</kbd><em>REWIND</em></span>
+        </div>
+        <p class="look-hint look-hint-touch">Best played sideways &middot; Pinch to zoom<span class="home-hint"> &middot; For full screen: Share → Add to Home Screen, then open Vectorfall from your Home Screen</span></p>
+        <button id="start" class="launch" type="button"><span>BEGIN EXPEDITION</span><i>→</i></button>
+      </div>
+      <div class="scene-caption" aria-hidden="true"><span>LOCATION / 001</span><strong>The Observatory</strong><em>Where tomorrow remembers you.</em><i></i><span>35° 41′ N &nbsp; / &nbsp; BLUE HOUR</span></div>
+    </section>
+
+    <div class="objective"><span class="signal-dot"></span><div><small>CURRENT OBJECTIVE</small><b>Recover the scattered light</b></div><span id="target-distance">— m</span></div>
+    <aside class="navigation" aria-label="Navigation radar"><div class="nav-heading"><span>LOCAL SCAN</span><b id="echo-count">00 ECHOES</b></div><canvas id="radar" width="300" height="300" aria-label="Map of your position, sparks, and echoes"></canvas><div class="nav-legend"><span>● YOU</span><span>◆ SPARK</span><span>● ECHO</span></div></aside>
+    <div id="spark-marker" class="spark-marker" aria-hidden="true"><i>◇</i><span>SPARK</span></div>
+    <div class="flight-hints"><span><kbd>W A S D</kbd> FLY</span><span><kbd>⇧</kbd>/<kbd>CLICK</kbd> BOOST</span><span><kbd>SPACE</kbd> REWIND</span></div>
+
+    <div id="shield-badge" class="shield-badge hidden" aria-live="polite">
+      <span class="shield-atom" aria-hidden="true"><i></i><i></i></span>
+      <b>SHIELD ON</b><em id="shield-count">×1</em>
+    </div>
+    <div id="touch-layer" aria-hidden="true"></div>
+    <div id="stick" aria-hidden="true"><i></i></div>
+    <div id="touch-buttons">
+      <button id="touch-rewind" type="button" aria-label="Rewind">⟲<small>REWIND</small></button>
+      <button id="touch-boost" type="button" aria-label="Boost (hold)">BOOST</button>
+    </div>
+    <div id="message" class="message hidden"></div>
+    <div id="cine-banner" class="cine-banner" aria-live="assertive"></div>
+    <div id="letterbox" aria-hidden="true"><i></i><i></i></div>
+    <div id="damage" aria-hidden="true"></div>
+    <div id="heart" aria-hidden="true"></div>
+
+    <footer class="footer">
+      <span><i></i> ATRIUM ONLINE</span>
+      <span id="status">AWAITING PILOT</span>
+      <span>VF–1964 &nbsp; / &nbsp; OBSERVATORY</span>
+    </footer>
+  </main>
+
+  <script src="vendor/three.min.js"></script>
+  <script src="presentation.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
